@@ -18,7 +18,24 @@ class HomeActivity: AppCompatActivity() {
 
     private fun initAdapter() {
         binding.recyclerview.adapter = MutipleAdapter().apply {
-            addData(listOf(ItemData(0, "本机应用"), ItemData(0, "联系人"), ItemData(0, "文件管理")))
+            addData(
+                listOf(
+                    ItemData(0, "本机应用"),
+                    ItemData(3, "微信"),
+                    ItemData(3, "微信"),
+                    ItemData(3, "微信"),
+
+                    ItemData(0, "联系人"),
+                    ItemData(2, "dsfdsfds"),
+                    ItemData(2, "dsfdsfds"),
+                    ItemData(2, "dsfdsfds"),
+
+                    ItemData(0, "文件管理"),
+                    ItemData(1, "dsfdsfds.jpg"),
+                    ItemData(1, "dsfdsfds.jpg"),
+                    ItemData(1, "dsfdsfds.jpg"),
+                )
+            )
         }
     }
 }

@@ -14,13 +14,13 @@
         app:layout_constraintStart_toStartOf="parent"/>
 
     <TextView
-        android:id="@+id/tv_file_name"
+        android:id="@+id/tv_app_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/iv_icon"
         app:layout_constraintTop_toTopOf="@id/iv_icon"
-        app:layout_constraintBottom_toBottomOf="@id/iv_icon"
         android:layout_marginStart="12dp"
         android:textSize="14sp"
         android:text="sdfsdfdsfs"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
