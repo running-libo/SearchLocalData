@@ -13,6 +13,12 @@ class HomeActivity: AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        initAdapter()
+    }
 
+    private fun initAdapter() {
+        binding.recyclerview.adapter = MutipleAdapter().apply {
+            addData(listOf(ItemData(0, "本机应用"), ItemData(0, "联系人"), ItemData(0, "文件管理")))
+        }
     }
 }
