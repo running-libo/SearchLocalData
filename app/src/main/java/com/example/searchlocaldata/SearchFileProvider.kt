@@ -7,13 +7,16 @@ import android.text.TextUtils
 import java.io.File
 import kotlin.collections.ArrayList
 
+/**
+ * 使用contentResolver查询本地各种文件
+ */
 object SearchFileProvider {
-    private const val MAX_FILE_COUNT = 30
+    private const val MAX_FILE_COUNT = 20
 
     /**
      * 模糊查询本地文件
      */
-    fun searchLocalFile(context: Context, key: String): ArrayList<FileBean> {
+    suspend fun searchLocalFile(context: Context, key: String): List<FileBean> {
         var list = ArrayList<FileBean>()
         val volumeName = "external"
         val columns = arrayOf(MediaStore.Files.FileColumns.DATA)
@@ -42,7 +45,7 @@ object SearchFileProvider {
                         File(absolutePath).apply {
                             if (exists() && !TextUtils.isEmpty(name) && name.contains(".")) {
                                 if (!TextUtils.isEmpty(name)) {
-                                    var bean = FileBean(name, path)
+                                    var bean = FileBean(name, path, readBytes().size)
                                     list.add(bean)
                                 }
                             }

@@ -39,8 +39,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadData(key: String) {
-        val localFiles = SearchFileProvider.searchLocalFile(applicationContext, key)
-        adapter.setDatas(localFiles)
+//        val localFiles = SearchFileProvider.searchLocalFile(applicationContext, key)
+//        adapter.setDatas(localFiles)
     }
 
     protected fun requestPermissions(
