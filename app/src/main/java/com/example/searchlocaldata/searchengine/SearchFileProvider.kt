@@ -1,9 +1,10 @@
-package com.example.searchlocaldata
+package com.example.searchlocaldata.searchengine
 
 import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore
 import android.text.TextUtils
+import com.example.searchlocaldata.bean.FileBean
 import java.io.File
 import kotlin.collections.ArrayList
 

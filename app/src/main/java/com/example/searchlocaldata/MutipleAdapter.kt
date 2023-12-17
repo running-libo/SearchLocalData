@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.searchlocaldata.ItemType.Companion.ITEM_TYPE_App
 import com.example.searchlocaldata.ItemType.Companion.ITEM_TYPE_CONTACT
 import com.example.searchlocaldata.ItemType.Companion.ITEM_TYPE_FILE
+import com.example.searchlocaldata.bean.AppBean
+import com.example.searchlocaldata.bean.FileBean
 import com.example.searchlocaldata.databinding.ItemAppBinding
 import com.example.searchlocaldata.databinding.ItemContactBinding
 import com.example.searchlocaldata.databinding.ItemFileBinding
@@ -88,7 +90,10 @@ class MutipleAdapter(val context: Context): RecyclerView.Adapter<RecyclerView.Vi
     inner class ViewHolderApp(val binding: ItemAppBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: AdapterItem) {
-            binding.tvAppName.text = item.headerTitle
+            if (item is AppBean) {
+                binding.tvAppName.text = item.name
+                binding.ivIcon.background = context.packageManager.getActivityIcon(item.intent)
+            }
         }
     }
 
