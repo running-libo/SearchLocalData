@@ -106,7 +106,9 @@ class MutipleAdapter(val context: Context): RecyclerView.Adapter<RecyclerView.Vi
         fun bind(item: AdapterItem) {
             if (item is AppBean) {
                 binding.tvAppName.text = item.name
-                binding.ivIcon.background = context.packageManager.getActivityIcon(item.intent)
+                item.intent?.let {
+                    binding.ivIcon.background = context.packageManager.getActivityIcon(it)
+                }
             }
         }
     }

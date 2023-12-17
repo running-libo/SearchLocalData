@@ -10,6 +10,8 @@ import android.os.Build
 import android.os.Process
 import android.text.TextUtils
 import com.example.searchlocaldata.bean.AppBean
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 object SearchAppProvider {
     fun searchInstallApps(context: Context): List<AppBean>? {
@@ -43,7 +45,29 @@ object SearchAppProvider {
         } catch (e: Exception) {
             //
         }
+
+
         return apps
+    }
+
+    /**
+     * 以flow的方式处理数据
+     */
+    fun getLocalApps(context: Context) : Flow<List<AppBean>> = flow {
+        val pm = context.packageManager
+        val packageInfos = pm.getInstalledPackages(0)
+        val apps = packageInfos.map { pkgInfo->
+            val appBean = pkgInfo.applicationInfo
+            val intent = getLaunchIntent(pm, pkgInfo.packageName)
+            intent?.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            AppBean(
+                pkgInfo.packageName,
+                appBean.icon,
+                appBean.loadLabel(pm).toString(),
+                intent
+            )
+        }
+        emit(apps)
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)

@@ -10,6 +10,7 @@ import com.example.searchlocaldata.searchengine.SearchContactProvider
 import com.example.searchlocaldata.searchengine.SearchFileProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -45,27 +46,35 @@ class HomeActivity: BasePermissionActivity(), BasePermissionActivity.PermissionL
      */
     private fun loadData(key: String) {
         adapter.clearData()
+
         //搜索本地App
-        GlobalScope.launch {
-            val apps = SearchAppProvider.searchInstallApps(applicationContext)
-            withContext(Dispatchers.Main) {
-                adapter.appendData(AdapterItem(0, "本机应用"))
-                    .appendDatas(apps!!.take(10))
-            }
+        val localAppsDeferred = GlobalScope.async(Dispatchers.IO) {
+            SearchAppProvider.searchInstallApps(applicationContext)
         }
+
         //搜索联系人
-        GlobalScope.launch {
-            val contacts = SearchContactProvider.searchContact(applicationContext, key)
-            withContext(Dispatchers.Main) {
-                adapter.appendData(AdapterItem(0, "联系人"))
-                    .appendDatas(contacts)
-            }
+        val contactsDeferred = GlobalScope.async(Dispatchers.IO) {
+            SearchContactProvider.searchContact(applicationContext, key)
         }
 
         //搜索本地文件
+        val localFilesDeferred = GlobalScope.async(Dispatchers.IO) {
+            SearchFileProvider.searchLocalFile(applicationContext, key)
+        }
+
         GlobalScope.launch {
-            val localFiles = SearchFileProvider.searchLocalFile(applicationContext, key)
+            // 通过 await 获取异步任务的结果
+            val localApps = localAppsDeferred.await()
+            val contacts = contactsDeferred.await()
+            val localFiles = localFilesDeferred.await()
+
             withContext(Dispatchers.Main) {
+                adapter.appendData(AdapterItem(0, "本机应用"))
+                adapter.appendDatas(localApps!!.take(10))
+
+                adapter.appendData(AdapterItem(0, "联系人"))
+                    .appendDatas(contacts)
+
                 adapter.appendData(AdapterItem(0, "文件管理")).appendDatas(localFiles)  //先添加内容的header，再添加内容
             }
         }
