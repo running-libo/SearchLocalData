@@ -9,6 +9,7 @@ import com.example.searchlocaldata.ItemType.Companion.ITEM_TYPE_App
 import com.example.searchlocaldata.ItemType.Companion.ITEM_TYPE_CONTACT
 import com.example.searchlocaldata.ItemType.Companion.ITEM_TYPE_FILE
 import com.example.searchlocaldata.bean.AppBean
+import com.example.searchlocaldata.bean.ContactBean
 import com.example.searchlocaldata.bean.FileBean
 import com.example.searchlocaldata.databinding.ItemAppBinding
 import com.example.searchlocaldata.databinding.ItemContactBinding
@@ -28,6 +29,11 @@ class MutipleAdapter(val context: Context): RecyclerView.Adapter<RecyclerView.Vi
     fun appendData(data: AdapterItem): MutipleAdapter {
         this.itemList.add(data)
         return this
+    }
+
+    fun clearData() {
+        itemList.clear()
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -83,7 +89,10 @@ class MutipleAdapter(val context: Context): RecyclerView.Adapter<RecyclerView.Vi
     inner class ViewHolderContact(val binding: ItemContactBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: AdapterItem) {
-            binding.tvName.text = item.headerTitle
+            if (item is ContactBean) {
+                binding.tvName.text = item.name
+                binding.tvNumber.text = item.number
+            }
         }
     }
 
