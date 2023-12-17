@@ -24,7 +24,8 @@ class HomeActivity: BasePermissionActivity(), BasePermissionActivity.PermissionL
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        requestPermissions(arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS), this)
+        requestPermissions(arrayOf(Manifest.permission.READ_CONTACTS,
+            Manifest.permission.CALL_PHONE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS), this)
 
         initAdapter()
 
@@ -35,7 +36,7 @@ class HomeActivity: BasePermissionActivity(), BasePermissionActivity.PermissionL
     }
 
     private fun initAdapter() {
-        adapter = MutipleAdapter(applicationContext)
+        adapter = MutipleAdapter(this)
         binding.recyclerview.adapter = adapter
     }
 
@@ -49,7 +50,7 @@ class HomeActivity: BasePermissionActivity(), BasePermissionActivity.PermissionL
             val apps = SearchAppProvider.searchInstallApps(applicationContext)
             withContext(Dispatchers.Main) {
                 adapter.appendData(AdapterItem(0, "本机应用"))
-                    .appendDatas(apps.take(10))
+                    .appendDatas(apps!!.take(10))
             }
         }
         //搜索联系人

@@ -1,93 +1,95 @@
-package com.example.searchlocaldata.searchengine;
+package com.example.searchlocaldata.searchengine
 
-import android.annotation.TargetApi;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.LauncherActivityInfo;
-import android.content.pm.LauncherApps;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.os.Build;
-import android.os.Process;
-import android.text.TextUtils;
-import com.example.searchlocaldata.bean.AppBean;
-import java.util.ArrayList;
-import java.util.List;
+import android.annotation.TargetApi
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.pm.LauncherApps
+import android.content.pm.PackageManager
+import android.os.Build
+import android.os.Process
+import android.text.TextUtils
+import com.example.searchlocaldata.bean.AppBean
 
-public class SearchAppProvider {
-
-    public static List<AppBean> searchInstallApps(Context context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            return checkInstallAppsBeforeL(context);
+object SearchAppProvider {
+    fun searchInstallApps(context: Context): List<AppBean>? {
+        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            checkInstallAppsBeforeL(context)
         } else {
-            return checkInstallAppsAfterL(context);
+            checkInstallAppsAfterL(context)
         }
     }
 
-    private static List<AppBean> checkInstallAppsBeforeL(Context context) {
-        List<AppBean> apps = new ArrayList<>();
-        PackageManager pm = context.getPackageManager();
+    private fun checkInstallAppsBeforeL(context: Context): List<AppBean> {
+        val apps: MutableList<AppBean> = ArrayList()
+        val pm = context.packageManager
         try {
-            List<PackageInfo> packageInfos = pm.getInstalledPackages(0);
-            for (int i = 0; i < packageInfos.size(); i++) {
-                PackageInfo pkgInfo = packageInfos.get(i);
-                ApplicationInfo AppBean = pkgInfo.applicationInfo;
-                if (TextUtils.equals(context.getPackageName(), pkgInfo.packageName)) continue;
-                Intent intent = getLaunchIntent(pm, pkgInfo.packageName);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                AppBean app = new AppBean(pkgInfo.packageName, AppBean.icon, AppBean.loadLabel(pm).toString(), intent);
-                apps.add(app);
+            val packageInfos = pm.getInstalledPackages(0)
+            for (i in packageInfos.indices) {
+                val pkgInfo = packageInfos[i]
+                val AppBean = pkgInfo.applicationInfo
+                if (TextUtils.equals(context.packageName, pkgInfo.packageName)) continue
+                val intent = getLaunchIntent(pm, pkgInfo.packageName)
+                intent!!.flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                val app = AppBean(
+                    pkgInfo.packageName,
+                    AppBean.icon,
+                    AppBean.loadLabel(pm).toString(),
+                    intent
+                )
+                apps.add(app)
             }
-        } catch (Exception e) {
+        } catch (e: Exception) {
             //
         }
-        return apps;
+        return apps
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private static List<AppBean> checkInstallAppsAfterL(Context context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return null;
-        LauncherApps launcherApps = (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
-        if (launcherApps == null) return null;
-        List<AppBean> apps = new ArrayList<>();
+    private fun checkInstallAppsAfterL(context: Context): List<AppBean>? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return null
+        val launcherApps = context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
+            ?: return null
+        val apps: MutableList<AppBean> = ArrayList()
         try {
-            List<LauncherActivityInfo> activityInfos = launcherApps.getActivityList(null, Process.myUserHandle());
-            for (LauncherActivityInfo activityInfo : activityInfos) {
-                ApplicationInfo AppBean = activityInfo.getApplicationInfo();
-                Intent intent = new Intent(Intent.ACTION_MAIN);
-                intent.addCategory(Intent.CATEGORY_LAUNCHER);
-                intent.setPackage(AppBean.packageName);
-                intent.setComponent(activityInfo.getComponentName());
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                AppBean app = new AppBean(AppBean.packageName, AppBean.icon, activityInfo.getLabel().toString(), intent);
-                apps.add(app);
+            val activityInfos = launcherApps.getActivityList(null, Process.myUserHandle())
+            for (activityInfo in activityInfos) {
+                val AppBean = activityInfo.applicationInfo
+                val intent = Intent(Intent.ACTION_MAIN)
+                intent.addCategory(Intent.CATEGORY_LAUNCHER)
+                intent.setPackage(AppBean.packageName)
+                intent.component = activityInfo.componentName
+                intent.flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                val app = AppBean(
+                    AppBean.packageName,
+                    AppBean.icon,
+                    activityInfo.label.toString(),
+                    intent
+                )
+                apps.add(app)
             }
-        } catch (Exception e) {
+        } catch (e: Exception) {
         }
-        return apps;
+        return apps
     }
 
-    private static Intent getLaunchIntent(PackageManager pm, String pkg) {
-        Intent intent = pm.getLaunchIntentForPackage(pkg);
-        if (intent != null) {
-            return intent;
+    private fun getLaunchIntent(pm: PackageManager, pkg: String): Intent? {
+        var intent = pm.getLaunchIntentForPackage(pkg)
+        return if (intent != null) {
+            intent
         } else {
-            intent = new Intent(Intent.ACTION_MAIN);
-            intent.addCategory(Intent.CATEGORY_LAUNCHER);
-            intent.setPackage(pkg);
-            List<ResolveInfo> apps = pm.queryIntentActivities(intent, 0);
+            intent = Intent(Intent.ACTION_MAIN)
+            intent.addCategory(Intent.CATEGORY_LAUNCHER)
+            intent.setPackage(pkg)
+            val apps = pm.queryIntentActivities(intent, 0)
             if (apps == null || apps.isEmpty()) {
-                return null;
+                return null
             }
-            ResolveInfo ri = apps.iterator().next();
-            if (ri == null) {
-                return null;
-            }
-            intent.setComponent(new ComponentName(pkg, ri.activityInfo.name));
-            return intent;
+            val ri = apps.iterator().next() ?: return null
+            intent.component = ComponentName(pkg, ri.activityInfo.name)
+            intent
         }
     }
 }

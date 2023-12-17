@@ -1,6 +1,8 @@
 package com.example.searchlocaldata
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -92,6 +94,9 @@ class MutipleAdapter(val context: Context): RecyclerView.Adapter<RecyclerView.Vi
             if (item is ContactBean) {
                 binding.tvName.text = item.name
                 binding.tvNumber.text = item.number
+                binding.tvCall.setOnClickListener {
+                    callPhone(item.number)
+                }
             }
         }
     }
@@ -127,6 +132,16 @@ class MutipleAdapter(val context: Context): RecyclerView.Adapter<RecyclerView.Vi
             }
             imageView.background = context.resources.getDrawable(drawableId)
         }
+    }
+
+    /**
+     * 拨打电话
+     */
+    fun callPhone(phoneNumber: String) {
+        var intent = Intent(Intent.ACTION_CALL)
+        var data = Uri.parse("tel:$phoneNumber")
+        intent.data = data
+        context.startActivity(intent)
     }
 
 }
